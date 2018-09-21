@@ -28,8 +28,7 @@
 </template>
 
 <script>
-import { eventBus } from "./../main.js";
-
+import * as actionTypes from "./../mutation-types.js";
 export default {
     data() {
         return {
@@ -42,12 +41,28 @@ export default {
             .then(response => response.json(), () => alert("error"))
             .then(products => (this.products = products));
     },
+    computed: {
+        cart() {
+            return this.$store.state.cart;
+        }
+    },
     methods: {
+        getCartItem(product) {
+            for (let i = 0; i < this.cart.items.length; i++) {
+                if (this.cart.items[i].product.id === product.id) {
+                    return this.cart.items[i];
+                }
+            }
+
+            return null;
+        },
         addProductToCart(product, quantity) {
-            eventBus.$emit("addItemToCart", {
-                product: product,
-                quantity: quantity
-            });
+            this.$store
+                .dispatch(actionTypes.ADD_PRODUCT_TO_CART, {
+                    product: product,
+                    quantity: quantity
+                })
+                .then(() => alert("This product added"));
         },
         clickedImage(product) {
             this.$router.push({

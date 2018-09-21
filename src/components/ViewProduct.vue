@@ -9,7 +9,7 @@
         <p>
             <strong>In stock:</strong> {{ product.inStock }}</p>
         <p>{{ product.description }}</p>
-        <div v-if="relatedProducts != null" id="related" style="margin: 500px 0 500px 0;">
+        <div v-if="relatedProducts != null" id="related">
             <h2>Related Products</h2>
             <ul>
                 <li v-for="relatedProduct in relatedProducts" :key="relatedProduct.id">

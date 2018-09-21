@@ -1,6 +1,7 @@
 <template>
     <div v-if="product != null">
-        <button class="btn btn-primary" @click="goBack">&laquo; Back</button>
+        <button class="btn btn-primary mr-2" @click="goBack">&laquo; Back</button>
+        <button class="btn btn-success mr-2" @click="addProductToCart({product: product, quantity: 1})">Add to cart</button>
         <h1>{{ product.name }}</h1>
 
         <ul class="nav nav-pills">
@@ -22,6 +23,8 @@
 </template>
 
 <script>
+import * as mutations from "./../mutation-types.js";
+import { mapActions } from "vuex";
 export default {
     props: {
         productId: {
@@ -57,7 +60,22 @@ export default {
         this.getProduct(to.params.productId).then(product => (this.product = product));
         next();
     },
+    computed: {
+        cart() {
+            return this.$store.state.cart;
+        }
+    },
     methods: {
+        ...mapActions({ addProductToCart: mutations.ADD_PRODUCT_TO_CART }),
+        getCartItem(product) {
+            for (let i = 0; i < this.cart.items.length; i++) {
+                if (this.cart.items[i].product.id === product.id) {
+                    return this.cart.items[i];
+                }
+            }
+
+            return null;
+        },
         getProduct(productId) {
             return this.$http
                 .get(`products/{productId}`, {

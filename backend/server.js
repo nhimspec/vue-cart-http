@@ -30,9 +30,7 @@ function deleteReview(productId, reviewId) {
         }
 
         if (index != -1) {
-            reviews.splice(index, 1);
-            product.reviews = reviews;
-            
+            product.reviews = reviews.splice(index, 1);
             return true;
         }
     }
@@ -67,6 +65,16 @@ app.get("/products/:id", (req, res) => {
     } else {
         res.sendStatus(404);
     }
+});
+
+app.post("/cart/add/:productId/:quantity", (req, res) => {
+    // Simulate adding product to cart
+    setTimeout(() => res.json({}), 1000);
+});
+
+app.post("/cart/increase-quantity/:productId", (req, res) => {
+    // Simulate increasing quantity in cart
+    setTimeout(() => res.json({}), 1000);
 });
 
 app.post("/products/:productId/reviews", (req, res) => {

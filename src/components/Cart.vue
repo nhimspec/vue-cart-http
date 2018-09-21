@@ -35,7 +35,15 @@
                         <strong>Taxes</strong>
                     </td>
 
-                    <td>{{ taxAmount | currency }}</td>
+                    <td>{{ taxAmount(10) | currency }}</td>
+                </tr>
+
+                <tr>
+                    <td class="text-right" colspan="2">
+                        <strong>Coupon code</strong>
+                    </td>
+
+                    <td><input type="text" class="form-control" placeholder="Enter coupon code here" v-model="couponCode"></td>
                 </tr>
 
                 <tr>
@@ -43,11 +51,15 @@
                         <strong>Grand total</strong>
                     </td>
 
-                    <td>{{ cartTotal + taxAmount | currency }}</td>
+                    <td>{{ cartTotal + taxAmount(10) | currency }}</td>
                 </tr>
 
                 <tr>
-                    <td colspan="2"></td>
+                    <td class="text-right" colspan="2">
+                        <span v-if="couponCode">
+                            <em>Lucky you! You entered the following coupon code: {{ couponCode }}</em>
+                        </span>
+                    </td>
                     <td>
                         <button class="btn btn-success" @click="checkout">Checkout</button>
                     </td>
@@ -60,10 +72,47 @@
 </template>
 
 <script>
-import CartMixin from "./../mixins/CartMixin";
+import { mapGetters, mapMutations } from "vuex";
+import * as mutations from "./../mutation-types.js";
 export default {
-    props: ["cart"],
-    mixins: [CartMixin],
+    computed: {
+        ...mapGetters(["cartTotal", "taxAmount"]),
+        cart() {
+            return this.$store.state.cart;
+        },
+        couponCode: {
+            get() {
+                return this.$store.state.couponCode;
+            },
+            set(value) {
+                this.$store.commit(mutations.UPDATE_COUPON_CODE, value);
+            }
+        }
+    },
+    methods: {
+        increaseQuantity(cartItem) {
+            cartItem.product.inStock--;
+            cartItem.quantity++;
+        },
+
+        decreaseQuantity(cartItem) {
+            cartItem.quantity--;
+            cartItem.product.inStock++;
+
+            if (cartItem.quantity == 0) {
+                this.removeItemFromCart(cartItem);
+            }
+        },
+
+        removeItemFromCart(cartItem) {
+            let index = this.cart.items.indexOf(cartItem);
+
+            if (index !== -1) {
+                this.cart.items.splice(index, 1);
+            }
+        },
+        ...mapMutations({ checkout: mutations.CHECKOUT })
+    },
     beforeRouteLeave(to, from, next) {
         if (this.cart.items.length > 0) {
             if (!confirm("Are you sure you don't want to buy these products?")) {

@@ -37,22 +37,19 @@
 </template>
 
 <script>
-import CartMixin from "./mixins/CartMixin.js";
-import { eventBus, authService } from "./main.js";
+import { authService } from "./main.js";
+import { mapGetters } from "vuex";
 export default {
-    mixins: [CartMixin],
     data() {
         return {
-            cart: {
-                items: []
-            },
             auth: authService
         };
     },
-    created() {
-        eventBus.$on("addItemToCart", data => {
-            this.addProductToCart(data.product, data.quantity);
-        });
+    computed: {
+        ...mapGetters(['cartTotal']),
+        cart() {
+            return this.$store.state.cart;
+        }
     }
 };
 </script>
